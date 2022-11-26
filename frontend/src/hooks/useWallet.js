@@ -118,6 +118,7 @@ export const WalletProvider = ({ children }) => {
     const { network } = walletSelector.options;
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
+    console.log("viewMethod args",args)
     let res = await provider.query({
       request_type: 'call_function',
       account_id: contractId,

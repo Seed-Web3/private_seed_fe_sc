@@ -15,7 +15,7 @@ function Login() {
       navigate("profile/preview/:account");
     }
   const onHandleNearButton = () => {
-    // navigate("profile/preview/:account")
+    navigate("/profile/preview/:account")
     signIn("seed.bonebon.testnet");
   };
 

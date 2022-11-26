@@ -36,11 +36,16 @@ const ProfileDisplay = () => {
   })
 
   const getProfile = async (account) => {
-    const res = await viewMethod(process.env.CONTRACT_NAME, 'view_profile', { account_id: account})
+    try{
+      const res = await viewMethod(process.env.CONTRACT_NAME, 'view_profile', { account_id: account})
 
-    if(res) {
-      setProfile(res.profile)
+      if(res) {
+        setProfile(res.profile)
+      }
+    }catch{
+      console.error("err get profile")
     }
+
   }
   useEffect(() => {
     console.log(111)
@@ -62,11 +67,11 @@ const ProfileDisplay = () => {
                 <Socialmedia />
                 <Skills />
                 {/* <JobListing /> */}
-                <Career />
+                {/*<Career />*/}
                 <Education />
                 <IntHobby />
                 <div className="flex justify-center items-center mb-[10rem]">
-                  <Endorsements />
+                  {/*<Endorsements />*/}
                 </div>
               </div>
             </UserProfileContext.Provider>
