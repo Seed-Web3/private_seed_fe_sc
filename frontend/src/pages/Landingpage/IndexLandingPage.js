@@ -8,8 +8,8 @@ import {beApi} from "../../services/api";
 function IndexLandingPage() {
     const params = useParams()
     useEffect(() => {
+        console.log('冯炜版本1')
         let code = window.location.href.split('=')[1]
-        console.log(code)
         beApi({
             method:'get',
             url:`/auth/email/magicLink`,
