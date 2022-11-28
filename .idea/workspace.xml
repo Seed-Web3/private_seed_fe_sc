@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="42e52224-e6da-443b-a595-ea82f1d9b112" name="Changes" comment="email登陆修改">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="42e52224-e6da-443b-a595-ea82f1d9b112" name="Changes" comment="合并修改">
       <change beforePath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Landingpage/IndexLandingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Landingpage/IndexLandingPage.js" afterDir="false" />
@@ -57,6 +56,7 @@
       <option name="presentableId" value="Default" />
       <updated>1669343120134</updated>
       <workItem from="1669343121561" duration="53647000" />
+      <workItem from="1669603257067" duration="313000" />
     </task>
     <task id="LOCAL-00001" summary="登录功能完成">
       <created>1669449092146</created>
@@ -92,6 +92,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="登录功能完成" />
     <MESSAGE value="部分样式修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="部分样式修改" />
+    <MESSAGE value="合并修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="合并修改" />
   </component>
 </project>
