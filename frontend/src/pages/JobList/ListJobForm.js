@@ -1,10 +1,50 @@
-import React, { useContext } from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import { JobCreationFormContext } from "./IndexJobListing";
 import {setProperty} from 'dot-prop'
+import {beApi} from "../../services/api";
 
 function ListJobForm() {
 
   const jobCreationFormContext = useContext(JobCreationFormContext)
+  let input = useRef()
+  let [skill,setSkill] = useState('haha')
+  let [skills,setSkills] = useState([])
+  let [filterSkills,setFilterSkills] = useState([])
+  useEffect(() => {
+    beApi({
+      method:'get',
+      url:`/skills`
+    }).then((res) => {
+      setSkills(skills = res.data)
+      // setTags(tags = res.data)
+      console.log(skills)
+    })
+  },[])
+  function fuzzySearch() {
+    console.log(event.target.value)
+
+    if (event.target.value != ''){
+      const filterList = (skills && skills.length) ? skills.filter(item => {
+        return item.name.indexOf(event.target.value) !== -1 // 这里是根据dataName进行模糊查询
+      }) : []
+      setFilterSkills(filterSkills = filterList)
+      console.log(filterSkills)
+    }else {
+      setFilterSkills(filterSkills = [])
+    }
+  }
+  let filterSkillsShow = filterSkills.map((item) => {
+    return(
+        <option key={item.id} value={item.name}>
+          {item.name}
+        </option>
+    )
+  })
+  // let displasy = function () {
+  //   if (filterSkills == []){
+  //     return "display:none"
+  //   }
+  // }
 
   return (
     <form>
@@ -33,7 +73,7 @@ function ListJobForm() {
             Description
           </label>
           <div>
-            <textarea 
+            <textarea
               name="description"
               className="resize-y rounded-md block w-full px-1 py-2 mt-2 text-gray-700 bg-white border focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
               value={jobCreationFormContext.form.description}
@@ -42,7 +82,7 @@ function ListJobForm() {
           </div>
         </div>
         {/* ------------------------------------------------------- 3 ----------------------------------------------------------*/}
-        <div className="mb-[5rem]">
+        <div className="mb-3">
           <label
             htmlFor="email"
             className="block text-lg  font-semibold text-left text-gray-800 px-2"
@@ -66,12 +106,20 @@ function ListJobForm() {
             Skill Required (choose from the list)
           </label>
           <input
+              ref={input}
             type=""
             className="rounded-md block w-full px-1 py-2 mt-2 text-gray-700 bg-white border  focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
             name="skills"
             value={jobCreationFormContext.form.skills}
             onChange={jobCreationFormContext.handleChange}
+            onInput={fuzzySearch}
           />
+          <select onChange={() => {
+            input.current.value = event.target.value
+          }
+          }>
+            {filterSkillsShow}
+          </select>
         </div>
         {/* ------------------------------------------------------- 5 ----------------------------------------------------------*/}
         <div className="mb-3">
@@ -100,6 +148,7 @@ function ListJobForm() {
             <div className="basis-2/4 mr-3">
               <input
                 type="number"
+                min={0}
                 className="rounded-md text-sm block w-full px-5 py-2 mt-2 text-gray-700 bg-white border  focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 placeholder="Min Yearly Salary in USD"
                 name="salary_min"
@@ -110,6 +159,7 @@ function ListJobForm() {
             <div className="basis-2/4">
               <input
                 type="number"
+                min={0}
                 className="rounded-md text-sm block w-full px-5 py-2 mt-2 text-gray-700 bg-white border  focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                 placeholder="Max Yearly Salary in USD"
                 name="salary_max"

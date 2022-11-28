@@ -32,7 +32,7 @@ const Profile = () => {
   })
 
   const [profileImg, setProfileImg] = useState()
-  
+
   const handleChange = (evt) => {
     const {type, value, name} = evt.target
 
@@ -92,7 +92,8 @@ const Profile = () => {
 
   return (
     <ProfileFormContext.Provider value={{form, profileImg, setProfileImg, onSubmit, handleChange}}>
-      {accountId && <ProfileForm />}
+      {/*{accountId && <ProfileForm />}*/}
+      {<ProfileForm />}
     </ProfileFormContext.Provider>
   );
 }

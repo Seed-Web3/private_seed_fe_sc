@@ -10,6 +10,7 @@ import Search from "../../../assets/img/search.png";
 import { ConfigContext } from "../../context/config.context";
 import { useWallet } from "../../hooks/useWallet";
 import { useNavigate } from "react-router-dom";
+import {beApi} from "../../services/api";
 
 
 function classNames(...classes) {
@@ -65,7 +66,33 @@ function JobsList(props) {
     navigate('/IndexRentTalent')
   }
 
-  const [tags] = useState([
+  let [skills,setSkills] = useState([])
+
+  useEffect(() => {
+    beApi({
+      method:'get',
+      url:`/skills`
+    }).then((res) => {
+      setSkills(skills = res.data)
+      // setTags(tags = res.data)
+    })
+  },[skills])
+
+  let skillShow = skills.slice(0,22).map((tag) => (
+                    <SearchTag tag={tag} key={tag.name} />
+                ))
+  //     {
+  //   console.log(skills)
+  //   return(
+  //       <div className="flex items-center gap-1 font-robotoMono mt-4">
+  //         {skills.map((tag) => (
+  //             <SearchTag tag={tag} key={tag.name} />
+  //         ))}
+  //       </div>
+  //   )
+  // }
+
+  let [tags] = useState([
     { name: "Full Stack Dev", selected: false },
     { name: "Solidity", selected: false },
     { name: "Rust", selected: false },
@@ -73,6 +100,8 @@ function JobsList(props) {
     { name: "Javascript", selected: false },
     { name: "Product Manager", selected: false },
   ]);
+
+
 
   const [jobs, setJobs] = useState([]);
 
@@ -93,7 +122,7 @@ function JobsList(props) {
 
   return (
     <>
-      <div className="mx-8 font-robotoMono">
+      <div className="mx-8 font-robotoMono" style={{maxWidth:"85%",margin:"0 auto"}}>
         <div className="flex flex-row justify-center w-full mt-[2rem]">
           <a onClick={goToJobCreationPage} href="" className="flex flex-col bg-[#DAFF3E] text-black w-[1077px]  md:h-[200px] justify-center items-center  mr-4 rounded-3xl">
             <p className="font-bold text-4xl">LIST JOB</p>
@@ -114,11 +143,10 @@ function JobsList(props) {
             <img
               src={Graphic2}
               alt=""
-              className="absolute scale-[0.3] mt-[3.7rem] ml-[13.8rem]"
+              className="absolute scale-[0.3] mt-[3rem] ml-[11rem]"
             />
           </a>
         </div>
-        <div onClick={() => {navigate('job/manage')}}>222</div>
         <div className="flex flex-row w-full mt-8">
           <div className="relative flex justify-start w-[50%]">
             <input
@@ -151,11 +179,10 @@ function JobsList(props) {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-1 font-robotoMono mt-4">
-          {tags.map((tag) => (
-            <SearchTag tag={tag} key={tag.name} />
-          ))}
+        <div className="flex items-center gap-1 font-robotoMono mt-4" style={{flexWrap:"wrap"}}>
+          {skillShow}
         </div>
+
         <div className="my-4 text-[#EDEDED]">
           <hr />
         </div>
