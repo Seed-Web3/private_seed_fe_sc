@@ -11,7 +11,7 @@ function IndexLandingPage() {
 
     useEffect(() => {
         let code = window.location.href.split('=')[1]
-        console.log(111)
+        console.log("版本1")
         navigate('/profile/form')
         beApi({
             method:'get',
