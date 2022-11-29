@@ -9,7 +9,7 @@ import {useNavigate} from "react-router-dom";
 function IndexRentTalent() {
   const navigate = useNavigate()
   const goToSuccess = () => {
-    navigate('/mintSuccess')
+    navigate('/submited')
   }
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[black] text-[#DAFF3E]">

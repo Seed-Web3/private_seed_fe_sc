@@ -1,17 +1,18 @@
-import React, { createContext, useState } from "react";
+import React, {createContext, useEffect, useState} from "react";
 import ListJobForm from "./ListJobForm";
 import Testimonial from "./Testimonial";
 import JobFormbg from "../../../assets/img/jobformbg2.png";
 import useIpfsFactory from "../../hooks/useIpfsFactory";
 import { useWallet } from "../../hooks/useWallet";
 import {useNavigate} from "react-router-dom";
+import {beApi} from "../../services/api";
 
 export const JobCreationFormContext = createContext()
 
 function IndexJobListing() {
   const navigate = useNavigate()
   const goToSuccess = () => {
-    navigate('/mintSuccess')
+    navigate('/submited')
   }
 
   const { ipfs } = useIpfsFactory()

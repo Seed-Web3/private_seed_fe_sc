@@ -39,6 +39,7 @@ import JobMgmt from "./src/pages/JobManagement/JobMgmt";
 import Form from './src/pages/profileForm/Form'
 import Learning from "./src/pages/myPage/learning";
 import MyJobHire from "./src/pages/JobManagement/myJobHire";
+import Submited from "./src/pages/JobList/submited";
 
 
 export default function App({ isSignedIn, wallet }) {
@@ -85,13 +86,13 @@ export default function App({ isSignedIn, wallet }) {
                 {/* Job Listing */}
 
 
-
+                <Route index element={<ListJobDisplay />} />
                 <Route exact path="/jobs" element={<ListJobDisplay />} />
                 <Route exact path="/job/create" element={<IndexJobListing />} />
                 <Route exact path='/IndexRentTalent' element={<IndexRentTalent/>}></Route>
               </Route>
 
-
+              <Route path="/submited" element={<Submited/>}></Route>
               <Route path="/user" element={<ProtectedLayout />}>
                 {/*<Route path="profile/form" element={<Profile />} />*/}
                 {/*<Route path="job/manage" element={<JobMgmt />} />*/}
@@ -104,7 +105,7 @@ export default function App({ isSignedIn, wallet }) {
 
               <Route path="/" element={<FullScreenLayout />}>
                 {/* Landing Page */}
-                {/*<Route index element={<LandingPage />} />*/}
+                {/*<Route index element={<ListJobDisplay />} />*/}
                 {/* Authentication */}
                 <Route exact path="/register" element={<Register />} />
                 <Route exact path="/login" element={<Login />} />

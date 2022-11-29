@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/seed_metabuild.iml" filepath="$PROJECT_DIR$/.idea/seed_metabuild.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/private_seed_fe_sc.iml" filepath="$PROJECT_DIR$/.idea/private_seed_fe_sc.iml" />
     </modules>
   </component>
 </project>
