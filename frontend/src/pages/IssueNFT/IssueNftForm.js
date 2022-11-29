@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bg from "../../../assets/img/globe2.png";
-import { GloryBadge } from "../../nft_contracts/glory-badge";
 import { useNavigate } from "react-router-dom";
+import { useWallet } from "../../hooks/useWallet";
+import useIpfsFactory from "../../hooks/useIpfsFactory";
 
-/*TODO
- * GENERATE TOKEN IDS
- */
-
-function IssueNftForm({ wallet }) {
+function IssueNftForm() {
   const navigate = useNavigate();
-  const contract = new GloryBadge({contractId: process.env.GLORY_BADGE_CONTRACT, walletToUse: wallet });
+  const { ipfs } = useIpfsFactory()
+  const { accountId, viewMethod,  callMethod, getTransactionResult } = useWallet()
 
   const [log, setLog] = useState();
   const [name, setName] = useState();
@@ -18,17 +16,20 @@ function IssueNftForm({ wallet }) {
   const [artwork, setArtwork] = useState();
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+  const [ipfsLink, setIpfsLink] = useState();
 
-  /*
-  * This method will check for params in the link that near-wallet-selector returns
-  * If the transaction is successful (i.e the only param is transaction hash), then it'll push a post request to our BE
-  */
   const urlParams = new URLSearchParams(window.location.search);
   const logs = {
     txh: urlParams.get("transactionHashes"),
     errorCode: urlParams.get("errorCode"),
     errorMessage: urlParams.get("errorMessage"),
   };
+
+
+  /*
+  * This method will check for params in the link that near-wallet-selector returns
+  * If the transaction is successful (i.e the only param is transaction hash), then it'll push a post request to our BE
+  */
   async function checkTxh() {
     if (logs.errorCode) {
       console.log(`Error: ${logs.errorCode}`);
@@ -37,15 +38,19 @@ function IssueNftForm({ wallet }) {
     if (logs.txh == null) {
       return;
     }
-
-    // Get result from the transactions
-    let result =await wallet.getTransactionResult(logs.txh);
-    setLog(result)
-
-    let data = await getMetadata(result?.data[0].token_ids[0])
-    //We only have issued date for now, so I'm sending it twice
-    await createEvent(data.metadata?.title, data.metadata?.description, data.metadata?.Date, data.metadata?.Date)
-    .then(navigate(`/nftlink?link=${logs.txh}`));
+    try{
+        // Get result from the transactions
+        let result =await getTransactionResult(logs.txh);
+        setLog(result)
+        let data = await getMetadata(result?.data[0].token_ids[0])
+        console.log(data.metadata)
+        //We only have issued date for now, so I'm sending it twice
+          // await createEvent(data.metadata?.title, data.metadata?.description, data.metadata?.Date, data.metadata?.Date)
+          // .then(navigate(`/nftlink?link=${logs.txh}`));
+    }
+    catch(err){
+      console.log(err)
+    }
   }
 
   const createEvent = async (name,description, startDate, endDate) => {
@@ -64,43 +69,59 @@ function IssueNftForm({ wallet }) {
     }).then((res) => {console.log(res)})
   }
 
-  //Get token metadata
-  async function getMetadata(token_id) {
-    return await contract.nft_token(token_id);
+  const onFileChange = (e) => {
+    setArtwork(e.target.files[0])
   }
 
-
   //Mint nft
-  async function handleSubmit(){
-    try{
-      // if(!name || !artwork || !startDate || !endDate) {
-      //   console.log('Somethings missing');
-      //   return ;
-      // }
-      navigate('/nftlink')
-      await contract.nft_mint(
-        'http://localhost:1234/indexissuenft?status=success',
-        {
-          title: name,
-          description: description,
-          media: artwork,
-          issued_at: new Date().toISOString(),
-          expires_at: endDate,
-          starts_at: startDate,
-          extra: "Creator", //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
-        },
-        wallet.accountId
-      )
+  const handleSubmit = async (e) => {
+    navigate('/batchmint');
+    e.preventDefault();
 
+    try{
+      if(!name || !startDate || !endDate) {
+        console.log('Somethings missing');
+        return ;
+      }
+      if(artwork) {
+        const cid = await ipfs.add(artwork)
+        setIpfsLink(`ipfs://${cid[0]?.hash}`);        
+      }
     }catch(error){
       console.log(error)
     }
   }
+  const mint = async () => {
+    if(ipfsLink) {
+      const res =  await callMethod({
+        contractId: process.env.GLORY_BADGE_CONTRACT, 
+        method: 'nft_mint', 
+        args: { 
+          metadata: {
+            title: name,
+            description: description,
+            media: ipfsLink,
+            issued_at: new Date().toISOString(),
+            expires_at: endDate,
+            starts_at: startDate,
+            extra: "Creator", //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
+          }, 
+          receiver_id: accountId 
+        }
+      });
+      console.log(res)
+    }
+  }
 
   useEffect(()=> {
-    wallet.createAccessKeyFor = process.env.GLORY_BADGE_CONTRACT //Change contract address for the current wallet
-    checkTxh();
-  }, []);
+    mint();
+  },[ipfsLink])
+
+  useEffect(()=> {
+    if(accountId){
+      checkTxh();
+    }
+  },[accountId])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">
@@ -153,8 +174,8 @@ function IssueNftForm({ wallet }) {
                     Artwork
                   </label>
                   <input
-                    type="" //Changed "file" to "" temporarily till we implement IPFS
-                    onChange={(e) => setArtwork(e.target.value)}
+                    type="file"
+                    onChange={onFileChange}
                     className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border rounded-md focus:border-blue-400 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                   />
                   <div className="text-sm">

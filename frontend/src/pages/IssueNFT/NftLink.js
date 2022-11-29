@@ -11,9 +11,8 @@ function NftLink() {
   };
 
   useEffect(() => {
-    let txh = searchParams.get("link")
+    let txh = searchParams.get("transactionHashes")
     setCopyText(`http://localhost:1234/claim?txh=${txh}`)
-    console.log(navigator)
   },[])
 
   return (
