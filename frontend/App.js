@@ -40,6 +40,7 @@ import Form from './src/pages/profileForm/Form'
 import Learning from "./src/pages/myPage/learning";
 import MyJobHire from "./src/pages/JobManagement/myJobHire";
 import Submited from "./src/pages/JobList/submited";
+import MintNTF from './src/pages/IssueNFT/MintNTF'
 
 
 export default function App({ isSignedIn, wallet }) {
@@ -143,6 +144,11 @@ export default function App({ isSignedIn, wallet }) {
                 element={<BatchMint wallet={wallet} />}
               />
               <Route path="*" element={<LandingPage />} />
+              <Route
+                  exact
+                  path="/MintNTF"
+                  element={<MintNTF/>}
+              />
 
             </Routes>
           </div>

@@ -72,7 +72,7 @@ const ProfileDisplay = () => {
                 <Education />
                 <IntHobby />
                 <div className="flex justify-center items-center mb-[10rem]">
-                  {/*<Endorsements />*/}
+                  <Endorsements />
                 </div>
               </div>
             </UserProfileContext.Provider>

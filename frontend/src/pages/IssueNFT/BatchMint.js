@@ -32,7 +32,7 @@ function BatchMint({wallet}) {
 
   //State that tracks whether checkboxes are ;clicked or not
   const [checkedState, setCheckedState] = useState(
-    new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch 
+    new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch
   );
 
    // Check if there is a transaction hash in the URL
@@ -41,10 +41,10 @@ function BatchMint({wallet}) {
    async function checkTxh() {
      if(logs.errorCode){
        console.log(`Error: ${logs.errorCode}`);
-       return ; 
+       return ;
      }
      if(logs.txh == null){
-      return ; 
+      return ;
      }
      // Get result from the transactions
      let result =await wallet.getTransactionResult(logs.txh);
@@ -68,9 +68,10 @@ function BatchMint({wallet}) {
   const upload = (e) => {
     addresses.push(e.target.value);
   }
-  
+
   //The data is supposed to be fetched from db
   async function handleSubmit(){
+    navigate('/MintNTF')
     try{
       await contract.bulk_nft_mint(
         {
@@ -81,9 +82,9 @@ function BatchMint({wallet}) {
             expires_at : "" ,
             starts_at : "" ,
             extra: "1" //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
-        },  
+        },
         list
-      )     
+      )
     }catch(error){
       console.log(error)
     }
@@ -142,7 +143,7 @@ function BatchMint({wallet}) {
                 <div className="flex flex-row text-2xl font-bold justify-center m-[1rem]">
                   Select and Mint in Batch
                 </div>
-                { isClicked ? 
+                { isClicked ?
                 <div className="flex flex-row my-[2rem]">
                   <input type="text" className="bg-white rounded-md border-2 text-xs p-1"  onChange={(e) => setAddress(e.target.value)}/>
                   <button
