@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="42e52224-e6da-443b-a595-ea82f1d9b112" name="Changes" comment="合并修改">
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Landingpage/IndexLandingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Landingpage/IndexLandingPage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/assets/img/placeholder.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/IssueNFT/MintNTF.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dist/index.3d214d75.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/IssueNFT/BatchMint.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/IssueNFT/BatchMint.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ProfileDisplay/display.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ProfileDisplay/display.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +35,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2I1JNuA4e9u3WC6F3jy9lWbp8qC" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -45,16 +53,22 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/assets/img" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="42e52224-e6da-443b-a595-ea82f1d9b112" name="Changes" comment="" />
+      <changelist id="bb4f994f-1930-429b-8e6c-98782d139814" name="Changes" comment="" />
       <created>1669343120134</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1669343120134</updated>
       <workItem from="1669343121561" duration="53647000" />
       <workItem from="1669603257067" duration="628000" />
+      <workItem from="1669702764099" duration="5467000" />
     </task>
     <task id="LOCAL-00001" summary="登录功能完成">
       <created>1669449092146</created>

@@ -34,7 +34,7 @@ function BatchMint() {
 
   //State that tracks whether checkboxes are ;clicked or not
   const [checkedState, setCheckedState] = useState(
-    new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch 
+    new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch
   );
 
   // Check if there is a transaction hash in the URL
@@ -99,7 +99,7 @@ function BatchMint() {
   
   //Metadata is supposed to be fetched from txh
   async function handleSubmit(){
-    navigate('/mintSuccess'); 
+    navigate('/MintNTF'); 
     try{
       await callMethod({
         contractId: process.env.GLORY_BADGE_CONTRACT, 
@@ -176,7 +176,7 @@ function BatchMint() {
                 <div className="flex flex-row text-2xl font-bold justify-center m-[1rem]">
                   Select and Mint in Batch
                 </div>
-                { isClicked ? 
+                { isClicked ?
                 <div className="flex flex-row my-[2rem]">
                   <input type="text" className="bg-white rounded-md border-2 text-xs p-1"  onChange={(e) => setAddress(e.target.value)}/>
                   <button
