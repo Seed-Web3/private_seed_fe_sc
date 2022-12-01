@@ -1,29 +1,31 @@
 import React ,{useEffect, useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import bg from "../../../assets/img/globe2.png";
-import { GloryBadge } from "../../nft_contracts/glory-badge";
-import { useNavigate } from 'react-router-dom';
 import { check } from "prettier";
+import { useWallet } from "../../hooks/useWallet";
 
 var addresses = [
   {
     address: "sordgom_1.testnet",
-    date: "09 Nov 2022 06:35:47 GMT",
+    date: "Tue, 29 Nov 2022 08:51:13 GMT",
   },
   {
     address: "sordgom_2.testnet",
-    date: "09 Nov 2022 06:35:47 GMT",
+    date: "Tue, 29 Nov 2022 08:51:13 GMT",
   },
 ];
 
 /*TODO
-* Fetch list of addresses...
-* Fetch token information
+* Fetch list of addresses from BE
+* Fetch token information from txh/token_id
 */
-function BatchMint({wallet}) {
+function BatchMint() {
   const navigate = useNavigate();
-  const contract = new GloryBadge({contractId: process.env.GLORY_BADGE_CONTRACT, walletToUse: wallet });
+  const { accountId, viewMethod,  callMethod, getTransactionResult } = useWallet()
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [metadata, setMetadata] = useState();
   //States of the components
   const [list, setList] = useState([]);
   const [log, setLog] = useState();
@@ -35,22 +37,48 @@ function BatchMint({wallet}) {
     new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch
   );
 
-   // Check if there is a transaction hash in the URL
-   const urlParams = new URLSearchParams(window.location.search);
-   const logs = { txh : urlParams.get("transactionHashes"), errorCode: urlParams.get("errorCode"), errorMessage: urlParams.get("errorMessage")};
-   async function checkTxh() {
-     if(logs.errorCode){
-       console.log(`Error: ${logs.errorCode}`);
-       return ;
-     }
-     if(logs.txh == null){
-      return ;
-     }
-     // Get result from the transactions
-     let result =await wallet.getTransactionResult(logs.txh);
-     setLog(result)
-     navigate('/'); //Not sure we navigate to where after this
-   }
+  // Check if there is a transaction hash in the URL
+  const logs = { txh : searchParams.get("transactionHashes"), errorCode: searchParams.get("errorCode"), errorMessage: searchParams.get("errorMessage")};
+  
+  /*
+  * This method will check for params in the link that near-wallet-selector returns
+  * If the transaction is successful (i.e the only param is transaction hash), then it'll push a post request to our BE
+  */
+  async function checkTxh() {
+    if (logs.errorCode) {
+      console.log(`Error: ${logs.errorCode}`);
+      return;
+    }
+    if (logs.txh == null) {
+      return;
+    }
+    try{
+        // Get result from the transactions
+        let result =await getTransactionResult(logs.txh);
+        setLog(result)
+        let data = await getMetadata(result?.data[0].token_ids[0])
+        setMetadata(data.metadata)
+        console.log(data.metadata)
+        //We only have issued date for now, so I'm sending it twice
+          // await createEvent(data.metadata?.title, data.metadata?.description, data.metadata?.Date, data.metadata?.Date)
+          // .then(navigate(`/nftlink?link=${logs.txh}`));
+    }
+    catch(err){
+      console.log(err)
+    }
+  }
+
+  //Get token metadata
+  async function getMetadata(token_id) {
+    const res = await viewMethod(
+      process.env.GLORY_BADGE_CONTRACT, 
+      'nft_token' , 
+      { 
+        token_id : token_id
+      }
+    );
+    return res;
+  }
 
   //Creates a boolean state for each address(returns checked)
   const handleOnClick = (index) => {
@@ -68,33 +96,38 @@ function BatchMint({wallet}) {
   const upload = (e) => {
     addresses.push(e.target.value);
   }
-
-  //The data is supposed to be fetched from db
+  
+  //Metadata is supposed to be fetched from txh
   async function handleSubmit(){
-    navigate('/MintNTF')
+    navigate('/MintNTF'); 
     try{
-      await contract.bulk_nft_mint(
-        {
-            title: "Test",
-            description: "Test",
-            media : "https://media.giphy.com/media/6SZ5iwN70lJyOdLZZH/giphy.gif",
-            issued_at : new Date().toISOString() ,
-            expires_at : "" ,
-            starts_at : "" ,
-            extra: "1" //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
-        },
-        list
-      )
+      await callMethod({
+        contractId: process.env.GLORY_BADGE_CONTRACT, 
+        method: 'bulk_nft_mint', 
+        args: { 
+          metadata:  {
+            title: metadata.title,
+            description: metadata.description,
+            media : metadata.media,
+            issued_at : metadata.issued_at ,
+            expires_at :metadata.expires_at ,
+            starts_at : metadata.starts_at ,
+            extra: "2" //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
+          },  
+          list: list 
+        }
+      });
     }catch(error){
       console.log(error)
     }
   }
 
   useEffect(()=> {
-    wallet.createAccessKeyFor = process.env.GLORY_BADGE_CONTRACT
-    checkTxh();
+    if(accountId){
+      checkTxh();
+    }
     console.log(addresses)
-  },[])
+  },[accountId])
 
   //Add the checked address to a list of total addresses
   useEffect(() => {

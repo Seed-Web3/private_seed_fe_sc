@@ -3,15 +3,12 @@ import { Link } from "react-router-dom";
 import bg from "../../../assets/img/globe2.png";
 import { Endorsement } from "../../nft_contracts/endorsement";
 import { useNavigate } from 'react-router-dom';
+import { useWallet } from "../../hooks/useWallet";
 
-/*TODO
-* GENERATE TOKEN IDS
-*/
 
-function IssueEndors({wallet}) {
+function IssueEndors() {
   const navigate = useNavigate();
-
-  const contract = new Endorsement({contractId: process.env.ENDORSEMENT_CONTRACT, walletToUse: wallet });
+  const { accountId, callMethod, getTransactionResult } = useWallet()
 
   const [receiverId, setReceiverId] = React.useState();
   const [text, setText] = React.useState();
@@ -22,6 +19,7 @@ function IssueEndors({wallet}) {
    // Check if there is a transaction hash in the URL
    const urlParams = new URLSearchParams(window.location.search);
    const logs = { txh : urlParams.get("transactionHashes"), errorCode: urlParams.get("errorCode"), errorMessage: urlParams.get("errorMessage")};
+   
    async function checkTxh() {
      if(logs.errorCode){
        console.log(`Error: ${logs.errorCode}`);
@@ -31,7 +29,7 @@ function IssueEndors({wallet}) {
       return ; 
      }
      // Get result from the transactions
-     let result =await wallet.getTransactionResult(logs.txh);
+     let result =await getTransactionResult(logs.txh);
      setLog(result)
      navigate('/mintSuccess');
    }
@@ -43,24 +41,28 @@ function IssueEndors({wallet}) {
         return ; 
       }
       // argument name and value - pass empty object if no args required
-      await contract.nft_mint(
-        {
+      await callMethod({
+        contractId: process.env.ENDORSEMENT_CONTRACT, 
+        method: 'nft_mint', 
+        args: { 
+          metadata: {
             title: name,
             description:text,
             text : text
-        },
-        receiverId
-      );
+          }, 
+          receiver_id: receiverId 
+        }
+      });
     }catch(error){
       console.log(error)
     }
   }
 
   useEffect(()=> {
-    console.log(process.env.ENDORSEMENT_CONTRACT)
-    wallet.createAccessKeyFor = process.env.ENDORSEMENT_CONTRACT //Change contract address for the current wallet
-    checkTxh();
-  },[])
+    if(accountId){
+      checkTxh();
+    }
+  },[accountId])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">

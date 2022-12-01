@@ -125,7 +125,7 @@ export default function App({ isSignedIn, wallet }) {
               <Route
                 exact
                 path="/issue"
-                element={<IssueEndors wallet={wallet} />}
+                element={<IssueEndors/>}
               />
               <Route exact path="/mintSuccess" element={<MintSuccess />} />
 
@@ -133,7 +133,7 @@ export default function App({ isSignedIn, wallet }) {
               <Route
                 exact
                 path="/indexissuenft"
-                element={<IndexIssueNft wallet={wallet} />}
+                element={<IndexIssueNft/>}
               />
               <Route exact path="/nftlink" element={<NftLink />} />
 
@@ -141,7 +141,7 @@ export default function App({ isSignedIn, wallet }) {
               <Route
                 exact
                 path="/batchmint"
-                element={<BatchMint wallet={wallet} />}
+                element={<BatchMint/>}
               />
               <Route path="*" element={<LandingPage />} />
               <Route

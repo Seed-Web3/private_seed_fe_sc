@@ -150,6 +150,23 @@ export const WalletProvider = ({ children }) => {
     });
   }
 
+  const getTransactionResult = async (txhash) => {
+    if(!walletSelector) { return }
+
+    const { network } = walletSelector.options;
+    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+
+    // Retrieve transaction result from the network
+    const transaction = await provider.txStatus(txhash, 'unnused');
+    //I changed this because it returns nothing
+    // return providers.getTransactionLastResult(transaction);
+
+    //This is some mind gymnastics 
+    let result = transaction?.receipts_outcome[0]?.outcome?.logs[0] 
+    result = result.replace('EVENT_JSON:', '');
+    return JSON.parse(result);
+  }
+
   const value = {
     wallet,
     accountId,
@@ -158,7 +175,8 @@ export const WalletProvider = ({ children }) => {
     signIn,
     signOut,
     viewMethod,
-    callMethod
+    callMethod,
+    getTransactionResult
   }
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
