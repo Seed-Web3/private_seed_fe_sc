@@ -5,8 +5,8 @@ import { useWallet } from "../../hooks/useWallet";
 import { AuthEnabled } from "./AuthEnabled";
 
 const navigation = [
-  { name: "LEARN", href: "/Learning", current: false },
-  { name: "BUILD", href: '/IndexRentTalent', current: false },
+  { name: "LEARN", href: "https://learn.seedweb3.io", current: false },
+  { name: "BUILD", href: 'https://learn.seedweb3.io/build', current: false },
   { name: "HIRE", href: "/jobs", current: false },
 ];
 
