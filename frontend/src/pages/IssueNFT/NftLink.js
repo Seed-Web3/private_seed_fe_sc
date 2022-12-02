@@ -12,7 +12,7 @@ function NftLink() {
 
   useEffect(() => {
     let txh = searchParams.get("transactionHashes")
-    setCopyText(`http://localhost:1234/claim?txh=${txh}`)
+    setCopyText(`http://localhost:1234/MintNFT?txh=${txh}`)
   },[])
 
   return (

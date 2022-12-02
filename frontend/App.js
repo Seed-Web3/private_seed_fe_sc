@@ -40,7 +40,7 @@ import Form from './src/pages/profileForm/Form'
 import Learning from "./src/pages/myPage/learning";
 import MyJobHire from "./src/pages/JobManagement/myJobHire";
 import Submited from "./src/pages/JobList/submited";
-import MintNTF from './src/pages/IssueNFT/MintNTF'
+import MintNFT from './src/pages/IssueNFT/MintNFT'
 
 
 export default function App({ isSignedIn, wallet }) {
@@ -146,8 +146,8 @@ export default function App({ isSignedIn, wallet }) {
               <Route path="*" element={<LandingPage />} />
               <Route
                   exact
-                  path="/MintNTF"
-                  element={<MintNTF/>}
+                  path="/MintNFT"
+                  element={<MintNFT/>}
               />
 
             </Routes>

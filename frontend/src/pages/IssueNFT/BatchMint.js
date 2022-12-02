@@ -99,7 +99,7 @@ function BatchMint() {
   
   //Metadata is supposed to be fetched from txh
   async function handleSubmit(){
-    navigate('/MintNTF'); 
+    navigate('/MintNFT'); 
     try{
       await callMethod({
         contractId: process.env.GLORY_BADGE_CONTRACT, 
