@@ -2,7 +2,7 @@ import bg from "../../../assets/img/globe2.png";
 import ntf from "../../../assets/img/placeholder.png"
 import React, { useEffect, useState } from "react";
 import { useWallet } from "../../hooks/useWallet";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const style1 = {
     position:"absolute",
@@ -21,7 +21,6 @@ const style2 = {
 
 function MintNFT() {
     let [a,seta] = useState(true)
-    const navigate = useNavigate();
     const { accountId, signIn } = useWallet();
     const [searchParams, setSearchParams] = useSearchParams();
     const [txh, setTxh] = useState(() => {
@@ -36,13 +35,14 @@ function MintNFT() {
          return saved || "";
      });
 
-
+    //If not logged in: Log in + claim
+    //If logged in: claim 
     const onHandleNearButton = () => {
         if(!accountId){
             signIn(process.env.GLORY_BADGE);
         }
-        if(txh){
-            SendTxh(`https://shark-app-46uev.ondigitalocean.app/event/claim`, {"txh": txh})
+        if(a && txh){
+            SendTxh(`https://shark-app-46uev.ondigitalocean.app/event/claim`, {eventTxHash: txh})
             .then((data) => {
                 console.log(data); // JSON data parsed by `data.json()` call
             });
@@ -52,31 +52,20 @@ function MintNFT() {
         
     };
 
-//     curl -X 'POST' \
-//   'https://shark-app-46uev.ondigitalocean.app/event/claim' \
-//   -H 'accept: */*' \
-//   -H 'Content-Type: application/json' \
-//   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2Njk5OTQ3MDMsImlhdCI6MTY2OTk5MTEwM30.rxrQrjH24OktnYFQjgYztlK6fkGyjZrpJDEBrAhmeUQ' \
-//   -d '{
-//   "eventTxHash": "7iYWA5ML9RW2YJJfceJCNaBT5LMVM6M2SqPYaRDEY6NS"
-// }'
-
     //Send txh to BE
     async function SendTxh(url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-        method: 'POST', 
-        headers: {
-        'Content-Type': 'application/json',
-        'Authorization':`Bearer ${token}`,
-        },
-        body: {
-        eventTxHash: data.txh
-        } 
-    });
-    return response.json(); // parses JSON response into native JavaScript objects
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization':`Bearer ${token}`,
+            },
+            body: JSON.stringify(data) 
+        });
+        return response.json(); 
     }
 
+    //Send txh to localStorage
     useEffect(()=> {
         if(accountId){
             if(searchParams.get("transactionHashes")){

@@ -10,9 +10,10 @@ function NftLink() {
     navigator.clipboard.writeText(copyText);
   };
 
+  //copy to clipboard functionality
   useEffect(() => {
     let txh = searchParams.get("transactionHashes")
-    setCopyText(`http://localhost:1234/MintNFT?txh=${txh}`)
+    setCopyText(`http://localhost:1234/MintNFT?transactionHashes=${txh}`)
   },[])
 
   return (

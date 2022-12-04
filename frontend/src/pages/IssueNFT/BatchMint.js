@@ -1,19 +1,7 @@
 import React ,{useEffect, useState} from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import bg from "../../../assets/img/globe2.png";
-import { check } from "prettier";
 import { useWallet } from "../../hooks/useWallet";
-
-var addresses = [
-  {
-    address: "sordgom_1.testnet",
-    date: "Tue, 29 Nov 2022 08:51:13 GMT",
-  },
-  {
-    address: "sordgom_2.testnet",
-    date: "Tue, 29 Nov 2022 08:51:13 GMT",
-  },
-];
 
 /*TODO
 * Fetch list of addresses from BE
@@ -21,9 +9,20 @@ var addresses = [
 */
 function BatchMint() {
   const navigate = useNavigate();
-  const { accountId, viewMethod,  callMethod, getTransactionResult } = useWallet()
+  const { accountId, viewMethod,  callMethod, getTransactionResult } = useWallet();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [txh, setTxh] = useState(() => {
+    // getting stored value
+     const saved = localStorage.getItem("txh");
+     const initialValue = JSON.parse(saved);
+     return initialValue || "";
+  });
+  const [token, setToken] = useState(() => {
+    // getting stored value
+    const saved = localStorage.getItem("token");
+    return saved || "";
+  });
 
   const [metadata, setMetadata] = useState();
   //States of the components
@@ -31,11 +30,7 @@ function BatchMint() {
   const [log, setLog] = useState();
   const [isClicked, setIsClicked] = useState();
   const [address, setAddress] = useState();
-
-  //State that tracks whether checkboxes are ;clicked or not
-  const [checkedState, setCheckedState] = useState(
-    new Array(addresses.length).fill(false) //Change 4 to the number of address we fetch
-  );
+  const [data, setData] = useState([]);
 
   // Check if there is a transaction hash in the URL
   const logs = { txh : searchParams.get("transactionHashes"), errorCode: searchParams.get("errorCode"), errorMessage: searchParams.get("errorMessage")};
@@ -58,10 +53,7 @@ function BatchMint() {
         setLog(result)
         let data = await getMetadata(result?.data[0].token_ids[0])
         setMetadata(data.metadata)
-        console.log(data.metadata)
-        //We only have issued date for now, so I'm sending it twice
-          // await createEvent(data.metadata?.title, data.metadata?.description, data.metadata?.Date, data.metadata?.Date)
-          // .then(navigate(`/nftlink?link=${logs.txh}`));
+        console.log(metadata)
     }
     catch(err){
       console.log(err)
@@ -80,26 +72,26 @@ function BatchMint() {
     return res;
   }
 
-  //Creates a boolean state for each address(returns checked)
-  const handleOnClick = (index) => {
-    const updatedCheckedState = checkedState.map((val, key) =>{
-      if (key === index) {
-        return !val;
-      } else {
-        return val;
-      }
-    });
-    setCheckedState(updatedCheckedState);
-  };
-
-  //Upload wallet address
-  const upload = (e) => {
-    addresses.push(e.target.value);
+  //Send txh to BE
+  async function GetList(url = '') {
+    try{
+      // Default options are marked with *
+      const response = await fetch(url, {
+          method: 'GET', 
+          headers: {
+          'Content-Type': 'application/json',
+          'Authorization':`Bearer ${token}`,
+          },
+      });
+      return response.json(); // parses JSON response into native JavaScript objects
+    }catch(err){
+      console.log(err)
+    }
   }
-  
-  //Metadata is supposed to be fetched from txh
+
+  //Mint function
   async function handleSubmit(){
-    navigate('/MintNFT'); 
+    navigate('/mintSuccess'); 
     try{
       await callMethod({
         contractId: process.env.GLORY_BADGE_CONTRACT, 
@@ -112,7 +104,7 @@ function BatchMint() {
             issued_at : metadata.issued_at ,
             expires_at :metadata.expires_at ,
             starts_at : metadata.starts_at ,
-            extra: "2" //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
+            extra: "Claimed" //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
           },  
           list: list 
         }
@@ -122,23 +114,48 @@ function BatchMint() {
     }
   }
 
+  //Manually add a wallet
+  const handleAddition = () => {
+    setData(data => [...data, {nearAddress: address}]);
+  }
+
+  //checkbox handle
+  const handleOnClick = index => {
+    const newData = [...data];
+    newData[index].isChecked = !newData[index].isChecked;
+    setData(newData);
+  };
+
+  //Fetch data from API and store it in a `data` state
+  useEffect(()=> {
+    GetList(`https://shark-app-46uev.ondigitalocean.app/event/${txh}/users`)
+    .then((data) => {
+      setData(data);
+    });  
+  },[txh])
+
+  //Get final list of selected users
+  useEffect(()=> {
+    let newList=[];
+    data.forEach((val,key)=> {
+      if(val?.isChecked){
+        newList.push(val.nearAddress);
+      }
+    })
+    setList(newList);
+  },[data])
+
+  //Store txh in localStorage
   useEffect(()=> {
     if(accountId){
+      if(searchParams.get("transactionHashes")){
+        let txh = searchParams.get("transactionHashes");
+        localStorage.setItem("txh", JSON.stringify(txh));
+        setTxh(txh);
+      }
       checkTxh();
     }
-    console.log(addresses)
   },[accountId])
-
-  //Add the checked address to a list of total addresses
-  useEffect(() => {
-    let newlist = [];
-    checkedState.map((val, key) =>{
-      if (val){
-        newlist.push(addresses[key].address)
-      }
-    });
-    setList(newlist);
-  },[checkedState]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">
@@ -182,11 +199,7 @@ function BatchMint() {
                   <button
                     type="button"
                     className="bg-white rounded-md border-2 text-xs p-1"
-                    onClick={() => {addresses.push({
-                      address: address,
-                      date: new Date().toUTCString(),
-                    },);
-                  setIsClicked(!isClicked)}}
+                    onClick={handleAddition}
                   >
                     Add Address
                   </button>
@@ -206,17 +219,24 @@ function BatchMint() {
                     <div className="ml-[1rem]">Wallet Address</div>
                     <div className="mr-[5rem]">Request Time</div>
                   </div>
-                  {
-                    addresses.map((val,key) => {
-                      return (
-                        <div className="flex flex-row justify-between" key={key}>
-                          <div>
-                              <input type="checkbox" className="mr-2" onClick={() => handleOnClick(key)}/>
-                              {val.address}
+                  { data.map((val,key) => {
+                      if(val.nearAddress){
+                        return (
+                          <div className="flex flex-row justify-between" key={key}>
+                            <div>
+                                <input 
+                                  key={key}
+                                  type="checkbox" 
+                                  className="mr-2" 
+                                  checked={val.isChecked}
+                                  onClick={() => handleOnClick(key)}
+                                />
+                                {val.nearAddress}
+                            </div>
+                            <div>{val.date}</div>
                           </div>
-                          <div>{val.date}</div>
-                        </div>
-                      );
+                        );
+                      }
                     })
                   }
                 </div>
