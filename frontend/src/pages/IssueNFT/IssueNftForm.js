@@ -8,7 +8,7 @@ import useIpfsFactory from "../../hooks/useIpfsFactory";
 function IssueNftForm() {
   const navigate = useNavigate();
   const { ipfs } = useIpfsFactory()
-  const { accountId, viewMethod,  callMethod, getTransactionResult } = useWallet()
+  const { accountId, callMethod, getTransactionResult } = useWallet()
 
   const [log, setLog] = useState();
   const [name, setName] = useState();
@@ -42,31 +42,10 @@ function IssueNftForm() {
         // Get result from the transactions
         let result =await getTransactionResult(logs.txh);
         setLog(result)
-        let data = await getMetadata(result?.data[0].token_ids[0])
-        console.log(data.metadata)
-        //We only have issued date for now, so I'm sending it twice
-          // await createEvent(data.metadata?.title, data.metadata?.description, data.metadata?.Date, data.metadata?.Date)
-          // .then(navigate(`/nftlink?link=${logs.txh}`));
     }
     catch(err){
       console.log(err)
     }
-  }
-
-  const createEvent = async (name,description, startDate, endDate) => {
-    await fetch('https://goldfish-app-xsljf.ondigitalocean.app/event',{
-      method: 'POST',
-      body: JSON.stringify(
-      {
-        "name": name,
-        "description": description,
-        "startDate": startDate,
-        "expiryDate": endDate
-      }),
-      headers: {
-        'Content-type': 'application/json',
-      },
-    }).then((res) => {console.log(res)})
   }
 
   const onFileChange = (e) => {
@@ -75,9 +54,8 @@ function IssueNftForm() {
 
   //Mint nft
   const handleSubmit = async (e) => {
-    navigate('/batchmint');
+    navigate('/nftlink');
     e.preventDefault();
-
     try{
       if(!name || !startDate || !endDate) {
         console.log('Somethings missing');
@@ -85,37 +63,31 @@ function IssueNftForm() {
       }
       if(artwork) {
         const cid = await ipfs.add(artwork)
-        setIpfsLink(`ipfs://${cid[0]?.hash}`);        
+        setIpfsLink(`ipfs://${cid[0]?.hash}`);    
+        if(artwork){
+          const res =  await callMethod({
+            contractId: process.env.GLORY_BADGE_CONTRACT, 
+            method: 'nft_mint', 
+            args: { 
+              metadata: {
+                title: name,
+                description: description,
+                media: ipfsLink,
+                issued_at: new Date().toISOString(),
+                expires_at: endDate,
+                starts_at: startDate,
+                extra: "Created", //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
+              }, 
+              receiver_id: accountId 
+            }
+          });
+          console.log(res)
+        }    
       }
     }catch(error){
       console.log(error)
     }
   }
-  const mint = async () => {
-    if(ipfsLink) {
-      const res =  await callMethod({
-        contractId: process.env.GLORY_BADGE_CONTRACT, 
-        method: 'nft_mint', 
-        args: { 
-          metadata: {
-            title: name,
-            description: description,
-            media: ipfsLink,
-            issued_at: new Date().toISOString(),
-            expires_at: endDate,
-            starts_at: startDate,
-            extra: "Creator", //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
-          }, 
-          receiver_id: accountId 
-        }
-      });
-      console.log(res)
-    }
-  }
-
-  useEffect(()=> {
-    mint();
-  },[ipfsLink])
 
   useEffect(()=> {
     if(accountId){
