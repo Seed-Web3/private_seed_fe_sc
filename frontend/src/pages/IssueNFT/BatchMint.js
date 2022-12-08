@@ -53,7 +53,6 @@ function BatchMint() {
         setLog(result)
         let data = await getMetadata(result?.data[0].token_ids[0])
         setMetadata(data.metadata)
-        console.log(metadata)
     }
     catch(err){
       console.log(err)
@@ -128,10 +127,12 @@ function BatchMint() {
 
   //Fetch data from API and store it in a `data` state
   useEffect(()=> {
-    GetList(`https://shark-app-46uev.ondigitalocean.app/event/${txh}/users`)
-    .then((data) => {
-      setData(data);
-    });  
+    if(txh){
+      GetList(`https://shark-app-46uev.ondigitalocean.app/event/${txh}/users`)
+      .then((data) => {
+        setData(data);
+      });  
+    }
   },[txh])
 
   //Get final list of selected users
