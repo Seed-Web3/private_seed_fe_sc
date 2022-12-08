@@ -1,9 +1,43 @@
 import React, { useEffect, useState } from "react";
 import bg from "../../../assets/img/globe2.png";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useWallet } from "../../hooks/useWallet";
 
 function NftLink() {
+  const navigate = useNavigate();
+  const { accountId, getTransactionResult } = useWallet()
+  const [log, setLog] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
+  const urlParams = new URLSearchParams(window.location.search);
+  const logs = {
+    txh: urlParams.get("transactionHashes"),
+    errorCode: urlParams.get("errorCode"),
+    errorMessage: urlParams.get("errorMessage"),
+  };
+
+   /*
+  * This method will check for params in the link that near-wallet-selector returns
+  * If the transaction is successful (i.e the only param is transaction hash), then it'll push a post request to our BE
+  */
+   async function checkTxh() {
+    if (logs.errorCode) {
+      console.log(`Error: ${logs.errorCode}`);
+      navigate('/');
+      return;
+    }
+    if (logs.txh == null) {
+      navigate('/');
+      return;
+    }
+    try{
+        // Get result from the transactions
+        let result =await getTransactionResult(logs.txh);
+        setLog(result)
+    }
+    catch(err){
+      console.log(err)
+    }
+  }
 
   const [copyText, setCopyText] = useState("");
   const onCopy = () => {
@@ -15,6 +49,12 @@ function NftLink() {
     let txh = searchParams.get("transactionHashes")
     setCopyText(`http://localhost:1234/MintNFT?transactionHashes=${txh}`)
   },[])
+
+  useEffect(()=> {
+    if(accountId){
+      checkTxh();
+    }
+  },[accountId])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-black">

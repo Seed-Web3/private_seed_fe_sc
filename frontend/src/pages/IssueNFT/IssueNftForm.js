@@ -52,9 +52,13 @@ function IssueNftForm() {
     setArtwork(e.target.files[0])
   }
 
+  const ToNFTLink = () => {
+    navigate('/nftlink')
+  }
+
   //Mint nft
   const handleSubmit = async (e) => {
-    navigate('/nftlink');
+    ToNFTLink();
     e.preventDefault();
     try{
       if(!name || !startDate || !endDate) {
@@ -63,8 +67,8 @@ function IssueNftForm() {
       }
       if(artwork) {
         const cid = await ipfs.add(artwork)
-        setIpfsLink(`ipfs://${cid[0]?.hash}`);    
-        if(artwork){
+        if(cid && cid.length>0){
+          setIpfsLink(`ipfs://${cid[0]?.hash}`);    
           const res =  await callMethod({
             contractId: process.env.GLORY_BADGE_CONTRACT, 
             method: 'nft_mint', 
@@ -72,10 +76,10 @@ function IssueNftForm() {
               metadata: {
                 title: name,
                 description: description,
-                media: ipfsLink,
+                media: `ipfs://${cid[0]?.hash}`,
                 issued_at: new Date().toISOString(),
-                expires_at: endDate,
                 starts_at: startDate,
+                expires_at: endDate,
                 extra: "Created", //This is supposed to reference who's minting (1 for owner, 2 for claimers  or something)
               }, 
               receiver_id: accountId 
